@@ -1,0 +1,22 @@
+{
+  "name": "video-call-project",
+  "version": "1.0.0",
+  "description": "Simple Node/React project",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "concurrently \"nodemon server/index.js\" \"cd client && yarn start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrbatocko/video-call.git"
+  },
+  "author": "mrbatocko",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrbatocko/video-call/issues"
+  },
+  "homepage": "https://github.com/mrbatocko/video-call#readme",
+  "dependencies": {
+    "concurrently": "^4.1.0"
+  }
+}
