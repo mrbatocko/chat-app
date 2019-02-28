@@ -5,12 +5,13 @@ import { faSignOutAlt, faPencilAlt } from '@fortawesome/free-solid-svg-icons'
 
 import ChatAvatar from '@/components/shared/ChatAvatar/ChatAvatar'
 import Status from '@/components/shared/AvailabilityIndicator/AvailabilityIndicator'
-import StatusChange from './Status/StatusChange'
 
 import { apiUrl } from '@/http'
 
 import { ChatContext } from '../../Home'
+
 import StatusMessageEdit from './StatusMessageEdit';
+import StatusChange from './StatusChange'
 
 export default class Header extends Component {
 
