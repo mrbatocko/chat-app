@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { transformedResponse } from '../../'
+import { transformedResponse } from '..'
 
 export const authRegister = user => {
   return transformedResponse(axios.post('/users/register', user))

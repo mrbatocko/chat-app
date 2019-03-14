@@ -1,6 +1,6 @@
 import { socketUrl } from '@/http'
 import io from 'socket.io-client'
 
-export const connectToRoom = (room, options) => {
-  return io(`${socketUrl}/${room}`, options)
+export const connectToNamespace = (nps, options) => {
+  return io(`${socketUrl}/${nps}`, options)
 }

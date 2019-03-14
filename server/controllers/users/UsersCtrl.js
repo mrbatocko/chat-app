@@ -1,4 +1,6 @@
 import UsersModel from '../../models/users/UsersModel'
+import ChatRequestsModel from '../../models/chat-requests/ChatRequestsModel'
+import ChatsModel from '../../models/chats/ChatsModel'
 import jwt from 'jsonwebtoken'
 
 export const Register = (req, res) => {
@@ -49,11 +51,19 @@ export const Login = (req, res) => {
 }
 
 export const getUserData = (req, res) => {
-  UsersModel.findOne({ username: req.user.username })
-    .then(mongoUser => {
-      let user = Object.assign({}, mongoUser._doc)
-      delete user.password
-      res.send({ user })
+  UsersModel.findOne({ username: req.user.username }, { password: 0 })
+    .then(user => {
+      Promise.all([
+        ChatsModel.find({ 'participants.username': user.username }),
+        ChatRequestsModel.find({ $and: [ { 'to.username': user.username }, { status: 'pending' } ] })
+      ])
+        .then(data => {
+          res.send({
+            user,
+            chats: data[0],
+            chat_requests: data[1]
+          })
+        })
     })
     .catch(error => {
       res.status(422).send(error)

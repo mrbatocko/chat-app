@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
 
 import { ChatContext } from '../../Home'
 import FullscreenModal from '@/components/shared/Modals/Fullscreen'
@@ -6,7 +7,7 @@ import SearchUsers from './SearchUsers'
 
 const SearchUsersModal = FullscreenModal(SearchUsers)
 
-export default class DirectChats extends Component {
+export default class Chats extends Component {
 
   state = {
     add_chat_modal: false
@@ -17,7 +18,6 @@ export default class DirectChats extends Component {
       <ChatContext.Consumer>
         {
           context => {
-            const chats = context.user.chats.filter(chat => chat.status === 'approved')
             return (
               <div>
                 <div className="flex items-center mb-3 pb-2 border-b border-indigo-light">
@@ -26,15 +26,13 @@ export default class DirectChats extends Component {
                     className="text-xs uppercase bg-indigo-darker text-grey-light px-2 py-1 rounded font-mono"
                     onClick={() => { this.setState({ add_chat_modal: true }) }}>Add chat</button>
                 </div>
-                { chats.length ? 
-                    this.renderChats(chats, context.selectChat) 
+                { context.data.chats.length ? 
+                    this.renderChats(context) 
                     : <p className="text-sm text-center opacity-50">No chats</p> }
                 {
                   this.state.add_chat_modal ? 
                     <SearchUsersModal 
-                      user={context.user}
-                      close={() => { this.setState({ add_chat_modal: false }) }}
-                      socket={this.props.socket}>
+                      close={() => { this.setState({ add_chat_modal: false }) }}>
                     </SearchUsersModal> : null
                 }
               </div>
@@ -45,12 +43,15 @@ export default class DirectChats extends Component {
     )
   }
 
-  renderChats (chats, selectChat) {
-    return chats.map(chat => {
+  renderChats (context) {
+    return context.data.chats.map(chat => {
+      const username = chat.participants.filter(p => p.username !== context.data.user.username)[0].username
       return (
-        <div className="flex" key={chat.with._id}>
-          <h4 onClick={() => { selectChat(chat) }} className="cursor-pointer">{chat.with.username}</h4>
-        </div>
+        <Link to={`/${username}`} key={username} className="no-underline text-grey-lighter">
+          <div className="flex mb-2">
+            <h4 className="cursor-pointer">{username}</h4>
+          </div>
+        </Link>
       )
     })
   }

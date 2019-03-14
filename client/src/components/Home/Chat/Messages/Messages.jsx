@@ -4,9 +4,6 @@ import { ChatContext } from '../../Home'
 
 import Input from './Input'
 
-// import { socketUrl } from '@/http'
-// import io from 'socket.io-client'
-
 export default class Messages extends Component {
 
   componentDidMount () {}
@@ -16,23 +13,36 @@ export default class Messages extends Component {
       <ChatContext.Consumer>
         {
           context => {
-            let renderData = null
-            if (context.selected_chat) {
-              renderData = (
-                <div className="flex-grow flex flex-col">
-                  <div className="flex-grow">
+            let messages = null
+            if (context.data.selected_chat) {
+              if (context.data.selected_chat_messages.length) {
+                messages = context.data.selected_chat_messages.map((message, index) => {
+                  return (
+                    <div key={index} className="flex">
+                      {/* <div>
+                        <ChatAvatar url={`${apiUrl}/users/${message.from.username}/${message.from.avatar}`} size={'small'}></ChatAvatar>
+                      </div> */}
+                      <div>
+                        <h4>{message.from} <span className="font-thin text-grey">{message.sent_on}</span></h4>
+                        <p>{message.content}</p>
+                      </div>
+                    </div>
+                  )
+                })
+              } else {
+                messages = <p>No messages</p>
+              }
+              return (
+                <div className="flex flex-col">
+                  <div className="overflow-y-auto pb-3">
+                    {messages}
                   </div>
                   <div>
                     <Input></Input>
                   </div>
                 </div>
               )
-              // const socket = io(`${socketUrl}/chat`)
-              // socket.on('chat-request', data => {
-              //   console.log(data)
-              // })
             }
-            return renderData
           }
         }
       </ChatContext.Consumer>

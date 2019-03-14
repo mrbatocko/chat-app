@@ -1,22 +1,14 @@
 import ChatModel from '../../models/chats/ChatsModel'
 import UserModel from '../../models/users/UsersModel'
+import ChatRequestsModel from '../../models/chat-requests/ChatRequestsModel'
 
 const OFFLINE_TIMEOUT = 5000 // Prevent going offline after disconnect event for this amount of time
 let OFFLINE_TIMEOUT_HANDLE = null
 
-export const getUserChats = (req, res) => {
-  ChatModel.find({ from: req.user.username })
-    .then(chats => {
-      res.send({ chats })
-    })
-    .catch(error => {
-      res.status(500).send(error)
-    })
-}
-
-export const chatMetaConnectionsHandle = connectionSocket => {
+export default connectionSocket => {
   connectionSocket.on('connection', socket => {
     if (socket.handshake.query.username) {
+      socket.join(socket.handshake.query.username)
       clearTimeout(OFFLINE_TIMEOUT_HANDLE)
       UserModel.findOne({ username: socket.handshake.query.username })
           .then(user => {
@@ -40,6 +32,15 @@ export const chatMetaConnectionsHandle = connectionSocket => {
             cb(error)
           })
       }, OFFLINE_TIMEOUT)
+    })
+    socket.on('get-chat-data', ({ username }, cb) => {
+      Promise.all([
+        UserModel.findOne({ username }),
+        ChatModel.findOne({ 'participants.username': username })
+      ])
+        .then(data => {
+          cb(null, { user: data[0], chat: data[1] })
+        })
     })
     socket.on('status-message-change', ({ status_message, username }, cb) => {
       if (username) {
@@ -81,16 +82,10 @@ export const chatMetaConnectionsHandle = connectionSocket => {
         cb(new Error('Please provide a username.'))
       }
     })
-    socket.on('search-user', (username, cb) => {
+    socket.on('search-users', ({ username }, cb) => {
       if (username) {
-        UserModel.find({ username: new RegExp(username, 'i') })
-          .then(mongoUsers => {
-            let users = mongoUsers.map(mUser => {
-              let user = Object.assign({}, mUser._doc)
-              delete user.chats
-              delete user.password
-              return user
-            })
+        UserModel.find({ username: new RegExp(username, 'i') }, 'username avatar')
+          .then(users => {
             cb(null, users)
           })
           .catch(error => {
@@ -101,54 +96,33 @@ export const chatMetaConnectionsHandle = connectionSocket => {
       }
     })
     socket.on('chat-request', ({ from, to }, cb) => {
-      console.log(from)
-      if (from && to) {
-        UserModel.findOne({ username: to })
-          .then(fromUser => {
-            if (fromUser.chats) {
-              let exists = fromUser.chats.includes(chat => chat.with._id === from._id)
-              if (!exists) {
-                fromUser.chats.push({ with: from, status: 'pending' })
-              }
-            } else {
-              fromUser.chats = [{ with: from, status: 'pending' }]
-            }
-            fromUser.save()
-              .then(() => {
-                cb(null, true)
-              })
-              .catch(error => {
-                cb(error)
-              })
-          })
-          .catch(error => {
-            console.log(error)
-            cb(error)
+      if (from && from.username && from.avatar && to && to.username && to.avatar) {
+        ChatRequestsModel.create({ from, to })
+          .then(request => {
+            socket.to(to.username).emit('chat-request', request)
+            cb()
           })
       } else {
-        cb(new Error('Please provide a from and to usernames.'))
+        cb(new Error('Please provide a from and to params.'))
       }
     })
-    socket.on('chat-request-action', ({ from, to, action }, cb) => {
-      if (from && to && action) {
-        UserModel.findOne({ username: to.username })
-          .then(mongoUser => {
-            const chats = mongoUser.chats.filter(chat => chat.with.username === from.username)
-            if (chats && chats.length) {
-              chats[0].status = action
-              mongoUser.save()
-                .then(() => {
-                  cb()
-                })
-                .catch(error => {
-                  cb(error)
+    socket.on('chat-request-action', ({ requestData, action }, cb) => {
+      if (requestData.from && requestData.to && action) {
+        ChatRequestsModel.findOne({ $and: [ { 'from.username': requestData.from.username }, { 'to.username': requestData.to.username } ] })
+          .then(request => {
+            if (action === 'approve') {
+              ChatModel.create({ participants: [ requestData.from, requestData.to ]})
+                .then(chat => {
+                  request.status = 'approved'
+                  request.save()
+                  cb(null, chat)
+                  socket.to(requestData.from.username).emit('request-approved', chat)
                 })
             } else {
-              cb(new Error('Something happened.'))
+              request.status = 'denied'
+              request.save()
+              cb(null, false)
             }
-          })
-          .catch(error => {
-            cb(error)
           })
       } else {
         cb(new Error('Please provide a valid data.'))

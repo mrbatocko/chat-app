@@ -28,11 +28,6 @@ var UserSchema = new _mongoose2.default.Schema({
     trim: true,
     lowercase: true
   },
-  role: {
-    type: String,
-    enum: ['USER', 'ADMIN'],
-    default: 'USER'
-  },
   password: {
     type: String,
     required: true
@@ -51,18 +46,6 @@ var UserSchema = new _mongoose2.default.Schema({
     type: String,
     enum: ['available', 'away', 'do-not-disturb'],
     default: 'available'
-  },
-  sent_requests: {
-    type: Array,
-    default: []
-  },
-  received_requests: {
-    type: Array,
-    default: []
-  },
-  chats: {
-    type: Array,
-    default: []
   },
   avatar: {
     type: String

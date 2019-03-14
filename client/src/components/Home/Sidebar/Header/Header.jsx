@@ -24,8 +24,8 @@ export default class Header extends Component {
       <ChatContext.Consumer>
         {
           context => {
-            const avatarUrl = context.user.avatar ? 
-              `${apiUrl}/users/${context.user.username}/${context.user.avatar}` 
+            const avatarUrl = context.data.user.avatar ? 
+              `${apiUrl}/users/${context.data.user.username}/${context.data.user.avatar}` 
               : `${apiUrl}/users/default-avatar.jpeg`
             return (
               <React.Fragment>
@@ -33,15 +33,15 @@ export default class Header extends Component {
                   <ChatAvatar url={avatarUrl}></ChatAvatar>
                   <div>
                     <h4 className="text-md mb-1 flex items-center"> 
-                      <span className="mr-2">{context.user.username}</span>
+                      <span className="mr-2">{context.data.user.username}</span>
                       <span onClick={() => { this.setState({ edit: 'status' })}}>
-                        <Status status={context.user.status}></Status>
+                        <Status status={context.data.user.status}></Status>
                       </span>
                     </h4>
                     <p 
                       title="Click to change"
                       className="text-sm">
-                      <span className="mr-2">{context.user.status_message}</span>
+                      <span className="mr-2">{context.data.user.status_message}</span>
                       <span 
                         className="cursor-pointer"
                         onClick={() => { this.setState({ edit: 'status_message' })}}>
@@ -53,7 +53,7 @@ export default class Header extends Component {
                     </p>
                   </div>
                   <div className="flex-grow flex justify-end">
-                    <button onClick={this.props.logout}>
+                    <button onClick={context.methods.logout}>
                       <FontAwesomeIcon icon={faSignOutAlt} size="lg" style={{ color: '#ffffff' }}>
                       </FontAwesomeIcon>
                     </button>
@@ -62,14 +62,14 @@ export default class Header extends Component {
                 {
                   this.state.edit === 'status_message' ? 
                     <StatusMessageEdit 
-                      status_message={context.user.status_message}
+                      status_message={context.data.user.status_message}
                       cancel={this.cancelEditing}
                       save={status_message => { this.saveStatusMessage(status_message, context) }}>
                     </StatusMessageEdit> : null }
                   {
                     this.state.edit === 'status' ?
                       <StatusChange 
-                        status={context.user.status}
+                        status={context.data.user.status}
                         cancel={this.cancelEditing}
                         save={status => { this.changeStatus(status, context) }}>
                       </StatusChange> : null
@@ -86,7 +86,7 @@ export default class Header extends Component {
     this.setState({ edit: '' })
   }
   saveStatusMessage = (status_message, context) => {
-    this.props.socket.emit('status-message-change', { status_message, username: context.user.username }, error => {
+    context.sockets.chat_meta.emit('status-message-change', { status_message, username: context.data.user.username }, error => {
       if (!error) {
         this.setState({ edit: '' })
         context.getUserData()
@@ -95,7 +95,7 @@ export default class Header extends Component {
   }
 
   changeStatus = (status, context) => {
-    this.props.socket.emit('status-change', { status, username: context.user.username }, error => {
+    context.sockets.chat_meta.emit('status-change', { status, username: context.data.user.username }, error => {
       if (!error) {
         this.setState({ edit: '' })
         context.getUserData()

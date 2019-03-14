@@ -9,6 +9,14 @@ var _UsersModel = require('../../models/users/UsersModel');
 
 var _UsersModel2 = _interopRequireDefault(_UsersModel);
 
+var _ChatRequestsModel = require('../../models/chat-requests/ChatRequestsModel');
+
+var _ChatRequestsModel2 = _interopRequireDefault(_ChatRequestsModel);
+
+var _ChatsModel = require('../../models/chats/ChatsModel');
+
+var _ChatsModel2 = _interopRequireDefault(_ChatsModel);
+
 var _jsonwebtoken = require('jsonwebtoken');
 
 var _jsonwebtoken2 = _interopRequireDefault(_jsonwebtoken);
@@ -60,10 +68,14 @@ var Login = exports.Login = function Login(req, res) {
 };
 
 var getUserData = exports.getUserData = function getUserData(req, res) {
-  _UsersModel2.default.findOne({ username: req.user.username }).then(function (mongoUser) {
-    var user = Object.assign({}, mongoUser._doc);
-    delete user.password;
-    res.send({ user: user });
+  _UsersModel2.default.findOne({ username: req.user.username }, { password: 0 }).then(function (user) {
+    Promise.all([_ChatsModel2.default.find({ 'participants.username': user.username }), _ChatRequestsModel2.default.find({ $and: [{ 'to.username': user.username }, { status: 'pending' }] })]).then(function (data) {
+      res.send({
+        user: user,
+        chats: data[0],
+        chat_requests: data[1]
+      });
+    });
   }).catch(function (error) {
     res.status(422).send(error);
   });

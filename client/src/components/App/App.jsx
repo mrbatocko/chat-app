@@ -29,14 +29,14 @@ class App extends Component {
         <Switch>
           <Route exact path="/settings" component={Settings} />
           <Route exact path="/register" component={Register} />
-          <Route exact path="/"
+          <Route exact path="/:username?"
             render={
               props => {
                 return (
                   <this.state.homePathComponent
-                    { ...props } 
                     logout={this.logout} 
-                    login={this.login}>
+                    login={this.login}
+                    { ...props }>
                   </this.state.homePathComponent>
                 )}} />
             <Route render={
