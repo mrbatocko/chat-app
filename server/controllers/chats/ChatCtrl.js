@@ -28,7 +28,7 @@ export default  connectionSocket => {
           }
           chat.save()
             .then(() => {
-              socket.broadcast.emit('message-received', { message: messageToSave })
+              socket.to(to.username).emit('message-received', { message: messageToSave })
               cb(null, messageToSave)
             })
             .catch(error => {

@@ -48,7 +48,7 @@ exports.default = function (connectionSocket) {
     socket.on('get-chat-data', function (_ref, cb) {
       var username = _ref.username;
 
-      Promise.all([_UsersModel2.default.findOne({ username: username }), _ChatsModel2.default.findOne({ 'participants.username': username })]).then(function (data) {
+      Promise.all([_UsersModel2.default.findOne({ username: username }, { password: 0 }), _ChatsModel2.default.findOne({ 'participants.username': username })]).then(function (data) {
         cb(null, { user: data[0], chat: data[1] });
       });
     });

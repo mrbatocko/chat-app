@@ -40,7 +40,7 @@ exports.default = function (connectionSocket) {
           chat.messages = [messageToSave];
         }
         chat.save().then(function () {
-          socket.broadcast.emit('message-received', { message: messageToSave });
+          socket.to(to.username).emit('message-received', { message: messageToSave });
           cb(null, messageToSave);
         }).catch(function (error) {
           cb(error);

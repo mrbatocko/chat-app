@@ -35,7 +35,7 @@ export default connectionSocket => {
     })
     socket.on('get-chat-data', ({ username }, cb) => {
       Promise.all([
-        UserModel.findOne({ username }),
+        UserModel.findOne({ username }, { password: 0 }),
         ChatModel.findOne({ 'participants.username': username })
       ])
         .then(data => {
