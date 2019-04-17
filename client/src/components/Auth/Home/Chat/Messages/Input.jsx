@@ -16,16 +16,17 @@ export default class Input extends Component {
         {
           context => {
             return (
-              <div>
-                <form onSubmit={event => { this.sendMessage(event, context) }} autoComplete={'off'}>
-                  <input 
-                    ref={this.inputRef}
-                    id="chat-message-input"
-                    type="text" placeholder="Type here" 
-                    className="w-full rounded border-2 border-indigo-dark bg-white px-3 py-2" 
-                    onChange={this.messageChange} />
-                </form>
-              </div>
+              <form 
+                onSubmit={event => { this.sendMessage(event, context) }} 
+                autoComplete={'off'}
+                className="leading-tight">
+                <input 
+                  ref={this.inputRef}
+                  id="chat-message-input"
+                  type="text" placeholder={`Text to ${context.data.active_chat.user.username}`} 
+                  className="w-full px-4 bg-transparent outline-none" 
+                  onChange={this.messageChange} />
+              </form>
             )
           }
         }

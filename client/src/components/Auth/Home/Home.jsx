@@ -5,7 +5,10 @@ import Chat from './Chat/Chat'
 import { getUserData } from '@/services/http/endpoints/user'
 import { connectToNamespace } from '@/services/sockets'
 
+import { mutate, subscribe, unsubscribe } from '@/state/user'
+
 export const ChatContext = React.createContext()
+
 
 export default class Home extends Component {
   state = {
@@ -18,50 +21,50 @@ export default class Home extends Component {
     active_chat: null,
     chat_requests: []
   }
-  async componentDidMount () {
-    const data = await this.getUserData()
-    if (data && this.props.match.params.username) {
-      this.getChatData(this.props.match.params.username)
-    }
+  componentDidMount () {
+    subscribe('home', this.onStateChange)
+    this.getUserData()
   }
-  componentDidUpdate () {
-    if (this.props.match.params.username) {
-      console.log(this.props.match.params.username)
-      this.getChatData(this.props.match.params.username)
-    }
+  componentWillUnmount () {
+    unsubscribe('home')
   }
+
   render () {
+    const contextObject = {
+      data: {
+        user: this.state.user,
+        chat_requests: this.state.chat_requests,
+        chats: this.state.chats,
+        active_chat: this.state.active_chat
+      },
+      methods: {
+        chatRequestApproved: this.onChatRequestApproved,
+        appendMessage: this.appendMessage
+      },
+      sockets: this.state.sockets
+    }
     return this.state.user ? (
-      <ChatContext.Provider
-        value={{
-          data: {
-            user: this.state.user,
-            chat_requests: this.state.chat_requests,
-            chats: this.state.chats,
-            active_chat: this.state.active_chat
-          },
-          methods: {
-            chatRequestApproved: this.onChatRequestApproved,
-            appendMessage: this.appendMessage
-          },
-          sockets: this.state.sockets
-        }}>
+      <ChatContext.Provider value={contextObject}>
         <div className="h-screen">
           <div className="flex min-h-full">
             <div style={{ 'minWidth': '300px' }}>
-              <Sidebar { ...this.props }></Sidebar>
+              <Sidebar />
             </div>
             <main className="flex-grow bg-grey-lightest">
-              <Chat { ...this.props }></Chat>
+              <Chat />
             </main>
           </div>
         </div>
       </ChatContext.Provider>
     ) : null
   }
+  onStateChange = (state) => {
+    console.log(state)
+  }
   getUserData = async () => {
     const { data } = await getUserData()
     if (data) {
+      mutate('SET_USER', data.user)
       const chat_meta = connectToNamespace('meta', { query: { username: data.user.username } })
       const chat = connectToNamespace('chat', { query: { username: data.user.username } })
       this.setupSocketEvents(chat_meta, chat)
@@ -72,12 +75,10 @@ export default class Home extends Component {
         sockets: { chat_meta, chat }
       })
     }
-    return data
   }
   getChatData = username => {
     this.state.sockets.chat_meta.emit('get-chat-data', { username }, (error, active_chat) => {
       if (!error) {
-        console.log(active_chat)
         this.setState({ active_chat })
       }
     })
@@ -85,7 +86,6 @@ export default class Home extends Component {
   setupSocketEvents = (chat_meta, chat) => {
     chat_meta.on('chat-request', this.onChatRequest)
     chat_meta.on('request-approved', this.onChatRequestApproved)
-    chat.on('message-received', this.appendMessage)
   }
   onChatRequest = request => {
     const { chat_requests } = this.state

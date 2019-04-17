@@ -7,10 +7,6 @@ import ChatAvatar from '@/components/shared/ChatAvatar/ChatAvatar'
 class Messages extends Component {
   messagesDiv = React.createRef()
 
-  componentDidMount () {
-    // this.messagesDiv.current.scrollTop = this.messagesDiv.current.scrollHeight
-  }
-
   componentDidUpdate () {
     this.messagesDiv.current.scrollTop = this.messagesDiv.current.scrollHeight
   }
@@ -37,14 +33,14 @@ class Messages extends Component {
           }
           return (
             <div key={index} className="flex mb-5" style={{ 'maxWidth': '70%' }}>
-              <div className="mr-1">
+              <div>
                 <ChatAvatar url={`${API_URL}/users/${info.username}/${info.avatar}`}></ChatAvatar>
               </div>
               <div>
                 <h4 className="mb-1">
                   <span className="mr-2">{message.from}</span>
                   <span className="font-thin text-xs text-grey-darker">{this.constructDateString(message.sent_on)}</span></h4>
-                <p className="text-grey-darkest text-md leading-normal">{message.content}</p>
+                <p className="text-grey-darkest leading-normal">{message.content}</p>
               </div>
             </div>
           )
@@ -53,11 +49,11 @@ class Messages extends Component {
         innerContent = <p>No messages</p>
       }
       return (
-        <div className="flex flex-col pb-3" style={{ 'height': 'calc(100vh - 81px)' }}>
-          <div className="h-full overflow-auto" ref={this.messagesDiv}>
+        <div className="flex flex-col" style={{ 'height': 'calc(100vh - 81px)' }}>
+          <div className="h-full overflow-auto px-4" ref={this.messagesDiv}>
             {innerContent}
           </div>
-          <div>
+          <div className="py-3 border-t bg-white">
             <Input></Input>
           </div>
         </div>

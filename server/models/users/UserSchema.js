@@ -26,11 +26,6 @@ const UserSchema = new mongoose.Schema({
     maxlength: 40,
     default: 'Hi there. I\'m using chatapp.'
   },
-  status: {
-    type: String,
-    enum: [ 'available', 'away', 'do-not-disturb' ],
-    default: 'available'
-  },
   avatar: {
     type: String
   }

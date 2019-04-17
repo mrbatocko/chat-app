@@ -42,11 +42,6 @@ var UserSchema = new _mongoose2.default.Schema({
     maxlength: 40,
     default: 'Hi there. I\'m using chatapp.'
   },
-  status: {
-    type: String,
-    enum: ['available', 'away', 'do-not-disturb'],
-    default: 'available'
-  },
   avatar: {
     type: String
   }

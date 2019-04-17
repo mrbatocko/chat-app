@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ChatAvatar from '@/components/shared/ChatAvatar/ChatAvatar'
 
-import { apiUrl } from '@/http'
+import { API_URL } from '@/services/http/config'
 
 import { ChatContext } from '../../Home'
 
@@ -41,7 +41,7 @@ export default class SearchUsers extends Component {
                         <div key={user._id} 
                           className="text-indigo-dark mr-3 mb-3 cursor-pointer flex items-center rounded-full border px-2 py-1"
                           onClick={() => { this.sendChatRequest(user, context) }}>
-                          <ChatAvatar circle url={`${apiUrl}/users/${user.username}/${user.avatar}`} size={'small'}></ChatAvatar>
+                          <ChatAvatar circle url={`${API_URL}/users/${user.username}/${user.avatar}`} size={'small'}></ChatAvatar>
                           <h4>
                             {user.username}
                           </h4>

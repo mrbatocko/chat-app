@@ -21,9 +21,9 @@ export default class Chats extends Component {
             return (
               <div>
                 <div className="flex items-center mb-3 pb-2 border-b border-indigo-light">
-                  <p className="flex-grow uppercase text-sm font-mono">Chats</p>
+                  <p className="flex-grow uppercase text-sm">Chats</p>
                   <button 
-                    className="text-xs uppercase bg-indigo-darker text-grey-light px-2 py-1 rounded font-mono"
+                    className="text-xs uppercase bg-indigo-darker text-grey-light px-2 py-1 rounded"
                     onClick={() => { this.setState({ add_chat_modal: true }) }}>Add chat</button>
                 </div>
                 { context.data.chats.length ? 

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Route, Redirect } from 'react-router-dom'
+import { Route, Redirect, Switch } from 'react-router-dom'
 
 import Settings from './Settings/Settings'
 import Home from '../Auth/Home/Home'
@@ -7,17 +7,11 @@ import Home from '../Auth/Home/Home'
 export default class Auth extends PureComponent {
   render () {
     return (
-      <div>
-        <Route exact path="/settings" component={Settings} />
-        <Route path="/:username?" component={Home} />
-        {/* <Route render={
-              () => {
-                return (
-                  <Redirect to="/" />
-                )
-              }
-          } /> */}
-      </div>
+      <Switch>
+        <Route path="/settings" component={Settings} />
+        <Route path="/" component={Home} />
+        <Route render={() => <Redirect to="/" />} />
+      </Switch>
     )
   }
 }

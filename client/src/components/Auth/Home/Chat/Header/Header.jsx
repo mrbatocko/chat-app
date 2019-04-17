@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import ChatAvatar from '@/components/shared/ChatAvatar/ChatAvatar'
 import Status from '@/components/shared/AvailabilityIndicator/AvailabilityIndicator'
 
-import { apiUrl } from '@/http'
+import { API_URL } from '@/services/http/config'
 import { ChatContext } from '../../Home'
 
 export default class ChatHeader extends Component {
@@ -15,9 +15,9 @@ export default class ChatHeader extends Component {
             if (context.data.active_chat) {
               return (
                 <header>
-                  <div className="flex bg-white px-3 py-2 border-b">
+                  <div className="flex bg-white px-2 py-2 border-b">
                     <div className="mr-1">
-                      <ChatAvatar url={`${apiUrl}/users/${context.data.active_chat.user.username}/${context.data.active_chat.user.avatar}`} size="large">
+                      <ChatAvatar url={`${API_URL}/users/${context.data.active_chat.user.username}/${context.data.active_chat.user.avatar}`} size="large">
                       </ChatAvatar>
                     </div>
                     <div>

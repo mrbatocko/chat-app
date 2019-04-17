@@ -9,7 +9,7 @@ export default props => {
       <div>
         <Header { ...props }></Header>
       </div>
-      <div className="flex flex-col px-3">
+      <div className="flex flex-col">
         <Messages { ...props }></Messages>
       </div>
     </section>

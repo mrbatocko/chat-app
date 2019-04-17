@@ -29,9 +29,6 @@ export const Login = (req, res) => {
             .then(() => {
               const user = Object.assign({}, mongoUser._doc)
               delete user.password
-              delete user.chatRequests
-              delete user.updatedAt
-              delete user.createdAt
               jwt.sign(user, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXP }, (error, token) => {
                 if (!error) {
                   res.send({ token })

@@ -71,27 +71,8 @@ exports.default = function (connectionSocket) {
         cb(new Error('Please provide a username.'));
       }
     });
-    socket.on('status-change', function (_ref3, cb) {
-      var status = _ref3.status,
-          username = _ref3.username;
-
-      if (username) {
-        _UsersModel2.default.findOne({ username: username }).then(function (user) {
-          user.status = status;
-          user.save().then(function () {
-            cb(null);
-          }).catch(function (error) {
-            cb(error);
-          });
-        }).catch(function (error) {
-          cb(error);
-        });
-      } else {
-        cb(new Error('Please provide a username.'));
-      }
-    });
-    socket.on('search-users', function (_ref4, cb) {
-      var username = _ref4.username;
+    socket.on('search-users', function (_ref3, cb) {
+      var username = _ref3.username;
 
       if (username) {
         _UsersModel2.default.find({ username: new RegExp(username, 'i') }, 'username avatar').then(function (users) {
@@ -103,9 +84,9 @@ exports.default = function (connectionSocket) {
         cb(new Error('Please provide a username.'));
       }
     });
-    socket.on('chat-request', function (_ref5, cb) {
-      var from = _ref5.from,
-          to = _ref5.to;
+    socket.on('chat-request', function (_ref4, cb) {
+      var from = _ref4.from,
+          to = _ref4.to;
 
       if (from && from.username && from.avatar && to && to.username && to.avatar) {
         _ChatRequestsModel2.default.create({ from: from, to: to }).then(function (request) {
@@ -116,9 +97,9 @@ exports.default = function (connectionSocket) {
         cb(new Error('Please provide a from and to params.'));
       }
     });
-    socket.on('chat-request-action', function (_ref6, cb) {
-      var requestData = _ref6.requestData,
-          action = _ref6.action;
+    socket.on('chat-request-action', function (_ref5, cb) {
+      var requestData = _ref5.requestData,
+          action = _ref5.action;
 
       if (requestData.from && requestData.to && action) {
         _ChatRequestsModel2.default.findOne({ $and: [{ 'from.username': requestData.from.username }, { 'to.username': requestData.to.username }] }).then(function (request) {

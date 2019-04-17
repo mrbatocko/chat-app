@@ -48,9 +48,6 @@ var Login = exports.Login = function Login(req, res) {
       mongoUser.validatePassword(password).then(function () {
         var user = Object.assign({}, mongoUser._doc);
         delete user.password;
-        delete user.chatRequests;
-        delete user.updatedAt;
-        delete user.createdAt;
         _jsonwebtoken2.default.sign(user, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXP }, function (error, token) {
           if (!error) {
             res.send({ token: token });

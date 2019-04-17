@@ -62,26 +62,6 @@ export default connectionSocket => {
         cb(new Error('Please provide a username.'))
       }
     })
-    socket.on('status-change', ({ status, username }, cb) => {
-      if (username) {
-        UserModel.findOne({ username })
-          .then(user => {
-            user.status = status
-            user.save()
-              .then(() => {
-                cb(null)
-              })
-              .catch(error => {
-                cb(error)
-              })
-          })
-          .catch(error => {
-            cb(error)
-          })
-      } else {
-        cb(new Error('Please provide a username.'))
-      }
-    })
     socket.on('search-users', ({ username }, cb) => {
       if (username) {
         UserModel.find({ username: new RegExp(username, 'i') }, 'username avatar')
